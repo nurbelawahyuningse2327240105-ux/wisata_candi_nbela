@@ -13,8 +13,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isSignedIn = true; // ubah ke true untuk menampilkan icon kamera/edit (sesuai slide)
 
   // contoh data pengguna
-  String userName = 'Satria Dimaz Mahendra';
-  String userEmail = 'Dimaz@gmail.com';
+  String userName = 'Nurbela Wahyu Ningse';
+  String userEmail = 'belawn@gmail.com';
   int favoriteCandiCount = 2;
 
   void signIn() {
@@ -98,6 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 8),
 
+                  // Divider & info
                   // Divider & info
                   const SizedBox(height: 12),
                   const Divider(color: Colors.grey),
