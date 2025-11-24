@@ -10,129 +10,104 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+//   TODO: 1. Deklarasi variabel yang dibutuhkan
+
   List<Candi> _filteredCandis = candiList;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  void _filterCandis(String query) {
-    setState(() {
-      _searchQuery = query.toLowerCase();
-      _filteredCandis = candiList.where((candi) {
-        return candi.name.toLowerCase().contains(_searchQuery) ||
-            candi.location.toLowerCase().contains(_searchQuery);
-      }).toList();
-    });
-  }
-
-  void _clearSearch() {
-    setState(() {
-      _searchController.clear();
-      _filteredCandis = candiList;
-      _searchQuery = '';
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Pencarian Candi',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.deepPurple,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          children: [
-            // 🔍 Search Field
-            Container(
+      //   TODO: 2. Buat appbar dengan judul pencarian candi
+      appBar: AppBar(title: Text('Pencarian Candi'),),
+      //   TODO: 3. Buat body berupa column
+      body: Column(
+        children: [
+          //   TODO: 4. Buat TextField pencarian sebagai anak dari column
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Container(
               decoration: BoxDecoration(
                 color: Colors.deepPurple[50],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextField(
                 controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                // TODO: 6. Implementasi fitur pencarian
                 decoration: InputDecoration(
-                  hintText: 'Cari candi ...',
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  prefixIcon: const Icon(Icons.search, color: Colors.deepPurple),
+                  hintText: 'Cari candi...',
+                  prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.deepPurple
+                  ),
+                  // TODO 7. Implementasi pengosongan input
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.deepPurple),
-                    onPressed: _clearSearch,
-                  )
-                      : null,
+                  contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                onChanged: _filterCandis,
               ),
             ),
-            const SizedBox(height: 16),
-
-            // 🏯 Daftar hasil pencarian
-            Expanded(
-              child: _filteredCandis.isEmpty
-                  ? const Center(
-                child: Text(
-                  'Tidak ada candi ditemukan.',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
-                ),
-              )
-                  : ListView.builder(
+          ),
+          //   TODO: 5. Buat ListView hasil pencarian sebagai anak dari Column
+          Expanded(
+            child: ListView.builder(
                 itemCount: _filteredCandis.length,
                 itemBuilder: (context, index) {
                   final candi = _filteredCandis[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple[50],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(8),
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          candi.imageAsset,
-                          width: 70,
-                          height: 70,
-                          fit: BoxFit.cover,
+                  // TODO: 8. Implementasi GestureDetector dan Hero animation
+                  return Card(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          width: 100,
+                          height: 100,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.asset(
+                              candi.imageAsset,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        candi.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                candi.name,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                candi.location,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      subtitle: Text(
-                        candi.location,
-                        style: const TextStyle(color: Colors.black54),
-                      ),
+                      ],
                     ),
                   );
-                },
-              ),
+                }
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

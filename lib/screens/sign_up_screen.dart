@@ -1,70 +1,66 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:shared_preferences/shared_preferences.dart";
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
-  //   TODO: 1. Deklarasi variabel
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   String _errorText = '';
-  bool _isSignedIn = false;
   bool _obscurePassword = true;
 
-  void _signIn() async {
+  // TODO: 1. Membuat fungsi _signUp
+  void _signUp() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String savedUsername = prefs.getString('username') ?? '';
-    final String savedPassword = prefs.getString('password') ?? '';
-    final String enteredUsername = _usernameController.text.trim();
-    final String enteredPassword = _passwordController.text.trim();
+    String name = _nameController.text.trim();
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
 
-    if(enteredPassword.isEmpty || enteredUsername.isEmpty) {
+    if (password.length < 8 ||
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[a-z]')) ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[@#$%^&*(),.?":{}|<>]'))) {
       setState(() {
-        _errorText = 'Nama pengguna dan kata sandi harus diisi';
+        _errorText = 'Minimal 8 karakter, kombinasi [A-Z], [a-z], [0-9], [!@#\\\$%^&*(),.?":{}|<>]';
       });
       return;
     }
+    // Simpan data pengguna di SharedPreferance
+    prefs.setString('fullname', name);
+    prefs.setString('username', username);
+    prefs.setString('password', password);
 
-    if(savedUsername.isEmpty || savedPassword.isEmpty) {
-      setState(() {
-        _errorText = 'Pengguna belum terdaftar. Silahkan daftar terlebih dahulu';
-      });
-      return;
-    }
+    // buat navigasi ke SignInScreen
+    Navigator.pushReplacementNamed(context, '/signin');
 
-    if(enteredUsername == savedUsername && enteredPassword == savedPassword) {
-      setState(() {
-        _errorText = '';
-        _isSignedIn = true;
-        prefs.setBool('isSignedIn', true);
-      });
-      //   Pemanggilan untuk menghapus semua halaman dalam tumpukan navigasi
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      });
-      // Sign in berhasil,navigasikan ke layar utama
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, '/');
-      });
-    } else {
-      setState(() {
-        _errorText = 'Nama pengguna atau kata sandi salah';
-      });
-    }
+    // print('*** Sign up berhasil!');
+    // print('Nama: $name');
+    // print('Nama Pengguna: $username');
+    // print('Kata Sandi: $password');
   }
 
+  // TODO: 2. Membuat fungsi dispose
+  @override
+  void dispose() {
+    //   TODO: implement dispose
+    _nameController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //     TODO: 2. Pasang AppBar
-      appBar: AppBar(title: Text('Sign In'),),
+      appBar: AppBar(title: Text('Sign Up'),),
       //     TODO: 3. Pasang body
       body: Center(
         child: SingleChildScrollView(
@@ -75,7 +71,16 @@ class _SignInScreenState extends State<SignInScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // TODO: 5. Pasang TextFormField Nama Pengguna
+                // TODO: 5. Pasang TextFormField Nama Lengkap
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: "Nama Lengkap",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                // TODO: 6. Pasang TextFormField Nama Pengguna
+                SizedBox(height: 20),
                 TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(
@@ -83,7 +88,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                // TODO: 6. Pasang TextFormField Kata Sandi
+                // TODO: 7. Pasang TextFormField Kata Sandi
                 SizedBox(height: 20),
                 TextFormField(
                   controller: _passwordController,
@@ -105,27 +110,27 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   obscureText: _obscurePassword,
                 ),
-                // TODO: 7. Pasang ElevatedButton Sign In
+                // TODO: 8. Pasang ElevatedButton Sign In
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: (){
-                    Navigator.pushReplacementNamed(context, '/');
+                    Navigator.pushReplacementNamed(context, '/signin');
                   },
-                  child: Text('Sign In',
+                  child: Text('Sign Up',
                   ),
                 ),
-                // TODO: 8. Pasang ElevatedButton Sign Up
+                // TODO: 9. Pasang ElevatedButton Sign Un
                 SizedBox(height: 10),
                 RichText(
                   text: TextSpan(
-                    text: 'Belum punya akun?',
+                    text: 'Sudah punya akun? ',
                     style: TextStyle(
                         fontSize: 16,
                         color: Colors.deepPurple
                     ),
                     children: <TextSpan> [
                       TextSpan(
-                        text: 'Daftar di sini',
+                        text: 'Login',
                         style: TextStyle(
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
@@ -133,7 +138,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pushNamed(context, '/signup');
+                            Navigator.pushNamed(context, '/signin');
                           },
                       ),
                     ],
