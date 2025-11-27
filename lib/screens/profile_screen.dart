@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/profile_info_item.dart';
+import 'package:wisata_candi/widgets/profile_info_item.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,162 +9,118 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // TODO: 1. deklarasikan variabel yang dibutuhkan
-  bool isSignedIn = true; // ubah ke true untuk menampilkan icon kamera/edit (sesuai slide)
+//   TODO 1 : Deklarasi variabel yang dibutuhkan
+  bool isSignedIn = false;
+  String fullName = '';
+  String userName = '';
+  int favoriteCandiCount = 0;
+  late Color iconColor;
 
-  // contoh data pengguna
-  String userName = 'Nurbela Wahyu Ningse';
-  String userEmail = 'belawn@gmail.com';
-  int favoriteCandiCount = 2;
-
+  // TODO 5. Implementasi fungsi signIn
   void signIn() {
-    setState(() {
-      isSignedIn = true;
-    });
+    // setState(() {
+    //   isSignedIn = true;
+    //   userName = 'Bela';
+    //   fullName = 'Nurbela Wahyu';
+    //   favoriteCandiCount = 3;
+    // });
+    Navigator.pushNamed(context, '/signin');
   }
 
+  // TODO 6. Implementasi fungsi signOut
   void signOut() {
     setState(() {
-      isSignedIn = false;
+      isSignedIn = !isSignedIn;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: [
-          // Container ungu di bagian atas
           Container(
-            height: 200,
-            width: double.infinity,
-            color: Colors.deepPurple,
+            height: 200, width: double.infinity, color: Colors.deepPurple,
           ),
-          // Main content
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  // beri ruang supaya avatar tumpang tindih sesuai instruksi
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50.0), // ~200 - 50 pada slide
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            // container pembungkus untuk memudahkan posisi
-                            padding: const EdgeInsets.all(4.0),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const CircleAvatar(
-                              radius: 60,
-                              backgroundImage: AssetImage('assets/images/placeholder_image.png'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                //   TODO 2 : Buat bagian ProfileHeader yang berisi gambar profile
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 200 - 50),
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.deepPurple, width: 2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: AssetImage('assets/placeholder_image.png'),
+                          ),
+                        ),
+                        if(isSignedIn)
+                          IconButton(
+                            onPressed: (){},
+                            icon: Icon(Icons.camera_alt,
+                              color: Colors.deepPurple[50],
                             ),
                           ),
-                          // camera icon conditionally shown
-                          if (isSignedIn)
-                            Positioned(
-                              right: -6,
-                              bottom: -6,
-                              child: Material(
-                                elevation: 2,
-                                shape: const CircleBorder(),
-                                color: Colors.white,
-                                child: IconButton(
-                                  onPressed: () {
-                                    // TODO: open modal bottom sheet in future per materi
-                                  },
-                                  icon: const Icon(Icons.camera_alt),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
-
-                  const SizedBox(height: 8),
-                  // Nama
-                  Text(
-                    userName,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Divider & info
-                  // Divider & info
-                  const SizedBox(height: 12),
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 12),
-
-                  // ProfileInfo: tiga baris
-                  ProfileInfoItem(
-                    icon: Icons.person,
-                    label: 'Full Name',
-                    value: userName,
-                    iconColor: Colors.deepPurple,
-                    showEditIcon: isSignedIn,
-                    onEditPressed: () {
-                      // TODO: implement edit name per materi pertemuan
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit name tapped')));
-                    },
-                  ),
-
-                  const SizedBox(height: 4),
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 4),
-
-                  ProfileInfoItem(
-                    icon: Icons.email,
-                    label: 'Email',
-                    value: userEmail,
-                    iconColor: Colors.deepPurple,
-                    showEditIcon: isSignedIn,
-                    onEditPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit email tapped')));
-                    },
-                  ),
-
-                  const SizedBox(height: 4),
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 4),
-
-                  ProfileInfoItem(
-                    icon: Icons.favorite,
-                    label: 'Favorite Candi',
-                    value: favoriteCandiCount == 0 ? '' : favoriteCandiCount.toString(),
-                    iconColor: Colors.deepPurple,
-                    showEditIcon: false,
-                    onEditPressed: null,
-                  ),
-
-                  const SizedBox(height: 20),
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 8),
-
-                  // ProfileAction
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        if (isSignedIn) {
-                          signOut();
-                        } else {
-                          signIn();
-                        }
-                      },
-                      child: Text(isSignedIn ? 'Sign Out' : 'Sign In'),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                //   TODO 3 : Buat bagian ProfileInfor yang berisi info profile
+                SizedBox(height: 20),
+                Divider(color: Colors.deepPurple[100]),
+                SizedBox(height: 4),
+                ProfileInfoItem(
+                  icon: Icons.lock,
+                  iconColor: Colors.amber,
+                  label: 'Pengguna',
+                  value: fullName,
+                  showEditIcon: isSignedIn,
+                  onEditPressed: () {},
+                ),
+                SizedBox(height: 4),
+                Divider(color: Colors.deepPurple[100]),
+                SizedBox(height: 4),
+                ProfileInfoItem(
+                  icon: Icons.person,
+                  label: 'Nama',
+                  value: userName,
+                  showEditIcon: isSignedIn,
+                  onEditPressed: () {
+                    debugPrint('Icon edit ditekan ...');
+                  },
+                  iconColor: Colors.blue,
+                ),
+                SizedBox(height: 4),
+                Divider(color: Colors.deepPurple[100]),
+                SizedBox(height: 4),
+                ProfileInfoItem(
+                  icon: Icons.favorite,
+                  label: 'Favorit',
+                  value: favoriteCandiCount > 0 ? '$favoriteCandiCount' : '',
+                  iconColor: Colors.red,
+                ),
+                //   TODO 4 : Buat bagian ProfileActions yang berisi TextButton sign in/out
+                SizedBox(height: 4),
+                Divider(color: Colors.deepPurple[100]),
+                SizedBox(height: 4),
+                isSignedIn ? TextButton(
+                    onPressed: signOut,
+                    child: Text('Sign Out'))
+                    : TextButton(
+                    onPressed: signIn,
+                    child: Text('Sign In')
+                ),
+              ],
             ),
           ),
         ],
