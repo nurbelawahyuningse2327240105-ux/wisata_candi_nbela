@@ -13,16 +13,40 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-
   bool isFavorite = false;
   bool isSignedIn = false;
 
-  Future<void> _toogleFavorite() async {
+  @override
+  void initState() {
+    super.initState();
+    _checkSignInStatus(); // Memeriksa status sign in saat layar dibuat
+    _loadFavoriteStatus(); // Memeriksa status favorite saat layar dibuat
+  }
+
+  //Memeriksa status sign in
+  void _checkSignInStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isSignedIn = prefs.getBool('isSignedIn') ?? false;
+    setState(() {
+      isSignedIn = isSignedIn;
+    });
+  }
+
+  //Memeriksa status favorite
+  void _loadFavoriteStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool favorite = prefs.getBool('favorite') ?? false;
+    setState(() {
+      isFavorite = favorite;
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    //   Memeriksa apakah pengguna sudah sign in
-    if(!isSignedIn) {
-      // Jika belum sign in, arahkan ke SignInScreen
+    //Memeriksa apakah pengguna sudah sign in
+    if (!isSignedIn) {
+      //jika belum sign in, arahkan ke SignInScreen
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, '/signin');
       });
@@ -43,10 +67,10 @@ class _DetailScreenState extends State<DetailScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Detail Header
+            //detail header
             Stack(
               children: [
-                // Gambar utama
+                //image utama
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: ClipRRect(
@@ -59,9 +83,9 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                   ),
                 ),
-                // Tombol back kustom
+                //padding back button
                 Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 32,
                   ),
@@ -71,24 +95,23 @@ class _DetailScreenState extends State<DetailScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                          Icons.arrow_back
-                      ),
-                    ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back,
+                        )),
                   ),
-                ),
+                )
               ],
             ),
-            // Detail Info
+            //detail info
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Info atas (nama candi dan tombol favorit)
+                  // info atas(nama candi dan tombol favorit)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -100,13 +123,53 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.favorite_border),
-                      ),
+                          onPressed: () {
+                            // Memeriksa status sign in
+                            void _checkSignInStatus() async {
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                              bool signedIn =
+                                  prefs.getBool('isSignedIn') ?? false;
+                              setState(() {
+                                isSignedIn = signedIn;
+                              });
+                            }
+
+                            // Memeriksa status favorit
+                            void _loadFavoriteStatus() async {
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                              bool favorite = prefs.getBool(
+                                  'favorite_${widget.candi.name}') ??
+                                  false;
+                              setState(() {
+                                isFavorite = favorite;
+                              });
+                            }
+
+                            Future<void> _toggleFavorite() async {
+                              SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                              bool favoriteStatus = !isFavorite;
+                              prefs.setBool('favorite_${widget.candi.name}',
+                                  favoriteStatus);
+                              setState(() {
+                                isFavorite = favoriteStatus;
+                              });
+                            }
+
+                            _toggleFavorite();
+                          },
+                          icon: Icon(
+                            isSignedIn && isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isSignedIn && isFavorite ? Colors.red : null,
+                          ))
                     ],
                   ),
                   SizedBox(height: 16),
-                  // Info tengah (lokasi, dibangun, tipe)
+                  // info tengah (lokasi, dibangun, tipe)
                   Row(
                     children: [
                       Icon(Icons.place, color: Colors.red),
@@ -126,12 +189,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       Icon(Icons.calendar_month, color: Colors.blue),
                       SizedBox(width: 8),
                       SizedBox(
-                        width: 70,
-                        child: Text(
-                          'Dibangun',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                          width: 70,
+                          child: Text('Dibangun',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
                       Text(': ${widget.candi.built}'),
                     ],
                   ),
@@ -140,19 +200,16 @@ class _DetailScreenState extends State<DetailScreen> {
                       Icon(Icons.house, color: Colors.green),
                       SizedBox(width: 8),
                       SizedBox(
-                        width: 70,
-                        child: Text(
-                          'Tipe',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                          width: 70,
+                          child: Text('Tipe',
+                              style: TextStyle(fontWeight: FontWeight.bold))),
                       Text(': ${widget.candi.type}'),
                     ],
                   ),
                   SizedBox(height: 16),
                   Divider(color: Colors.deepPurple.shade100),
                   SizedBox(height: 16),
-                  // Info bawah (deskripsi)
+                  // info bawah (deskripsi)
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Column(
@@ -174,25 +231,25 @@ class _DetailScreenState extends State<DetailScreen> {
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),
-            // Detail Gallery
+            // DetailGallery
             Padding(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Divider(color: Colors.deepPurple.shade100),
+                  Divider(
+                    color: Colors.deepPurple.shade100,
+                  ),
                   Text(
                     'Galeri',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(
+                    height: 10,
+                  ),
                   SizedBox(
                     height: 100,
                     child: ListView.builder(
@@ -201,16 +258,16 @@ class _DetailScreenState extends State<DetailScreen> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: EdgeInsets.only(left: 8),
+                          // bingkai
                           child: GestureDetector(
                             onTap: () {},
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.deepPurple.shade100,
-                                  width: 2,
-                                ),
-                              ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.deepPurple.shade100,
+                                    width: 2,
+                                  )),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
                                 child: CachedNetworkImage(
@@ -223,7 +280,8 @@ class _DetailScreenState extends State<DetailScreen> {
                                     height: 120,
                                     color: Colors.deepPurple[50],
                                   ),
-                                  errorWidget: (context, url, error) => Icon(Icons.error),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
                                 ),
                               ),
                             ),
@@ -232,7 +290,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       },
                     ),
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(
+                    height: 4,
+                  ),
                   Text(
                     'Tap untuk memperbesar',
                     style: TextStyle(
@@ -242,7 +302,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   ),
                 ],
               ),
-            ),
+            )
           ],
         ),
       ),

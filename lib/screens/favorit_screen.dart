@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../data/candi_data.dart';
-import '../models/candi.dart';
-import '../widgets/item_card.dart';
+import 'package:wisata_candi/models/candi.dart';
+import 'package:wisata_candi/screens/detail_screen.dart';
+import 'package:wisata_candi/data/candi_data.dart';
+import 'package:wisata_candi/widgets/item_card.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
